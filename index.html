@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MANEJA DOR - Caça-palavras das Condutas</title>
+  <link rel="stylesheet" href="style/style.css">
+</head>
+<body>
+  <div id="rotate-notice" aria-hidden="true">
+    <div class="rotate-phone">↻</div>
+    <strong>Vire o celular</strong>
+    <span>Para selecionar as palavras com mais conforto, use a tela na horizontal.</span>
+  </div>
+
+  <div id="game-container" class="intro-mode">
+    <section id="intro" class="screen active">
+      <img src="img/manejador.jpg" id="logo" alt="MANEJA DOR">
+      <div class="brand-fallback" aria-hidden="true">MANEJA DOR</div>
+
+      <h1>Caça-palavras das Condutas</h1>
+
+      <p class="intro-text">
+        Encontre, na grade, as condutas mais coerentes para pacientes já avaliados e com risco estratificado.
+        Cada fase apresenta um caso, seus fatores e uma lista de palavras-chave para fixação.
+      </p>
+
+      <button id="start-intro-btn" class="primary-btn">INICIAR JOGO</button>
+    </section>
+
+    <section id="video-screen" class="screen">
+      <video id="intro-video" controls playsinline poster="img/manejador.jpg">
+        <source src="video/manejador.mp4" type="video/mp4">
+      </video>
+
+      <div id="video-fallback">
+        <img src="img/manejador.jpg" alt="MANEJA DOR">
+        <div>
+          <span class="eyebrow">Introdução</span>
+          <h2>Condutas escondidas no cuidado</h2>
+          <p>Leia o caso, observe o risco e encontre as palavras que representam condutas adequadas.</p>
+        </div>
+      </div>
+
+      <p class="intro-text">
+        Informe seu nome. Para selecionar uma palavra, clique na primeira letra e depois na última, ou arraste sobre a palavra.
+      </p>
+
+      <input type="text" id="player-name" maxlength="28" placeholder="Digite seu nome">
+      <button id="start-btn" class="primary-btn">CONTINUAR</button>
+    </section>
+
+    <section id="game-area" class="screen">
+      <div id="top-panel">
+        <div class="panel-card">Jogador: <span id="player-display">Profissional</span></div>
+        <div class="panel-card">Fase: <span id="case-counter">1</span>/<span id="case-total">5</span></div>
+        <div class="panel-card">Pontuação: <span id="score-display">0</span></div>
+        <div class="panel-card">Encontradas: <span id="found-count">0</span>/<span id="word-total">0</span></div>
+      </div>
+
+      <div id="clinical-layout">
+        <aside id="patient-card">
+          <span class="eyebrow">Paciente já avaliado</span>
+          <h2 id="patient-title"></h2>
+          <p id="patient-description"></p>
+
+          <div class="risk-strip">
+            <small>Estratificação</small>
+            <strong id="risk-label"></strong>
+          </div>
+
+          <div class="factor-list">
+            <h3>Fatores identificados</h3>
+            <ul id="factor-list"></ul>
+          </div>
+        </aside>
+
+        <main id="puzzle-card">
+          <div class="puzzle-head">
+            <div>
+              <span class="eyebrow">Caça-palavras</span>
+              <h2>Encontre as condutas do caso</h2>
+            </div>
+            <button id="next-case" class="primary-btn" type="button">PRÓXIMA FASE</button>
+          </div>
+
+          <div id="game-board">
+            <section id="word-search" aria-label="Grade do caça-palavras"></section>
+
+            <aside id="word-panel">
+              <h3>Palavras para encontrar</h3>
+              <p id="hint-text"></p>
+              <div id="word-list"></div>
+              <button id="clear-selection" type="button">Limpar seleção</button>
+            </aside>
+          </div>
+        </main>
+      </div>
+
+      <div id="feedback" role="status">Leia o caso e encontre as condutas na grade.</div>
+      <button id="back-to-top" type="button" aria-label="Voltar ao topo">↑</button>
+    </section>
+
+    <section id="final-screen" class="screen">
+      <div id="final-emoji">✓</div>
+      <h1 id="final-title"></h1>
+      <p class="intro-text" id="final-message"></p>
+      <div id="final-breakdown"></div>
+      <button id="restart-btn" class="primary-btn" onclick="location.reload()">JOGAR NOVAMENTE</button>
+    </section>
+  </div>
+
+  <audio id="sound-bg" loop>
+    <source src="audio/sunshine-rain.mp3" type="audio/mpeg">
+  </audio>
+
+  <footer id="credits">
+    <strong>© 2026 ManejaDor.</strong>
+    Produto educacional de Edson Flavio de Sousa - ORCID:0000-0003-2960-6033.
+    Recursos visuais feitos pelas tecnologias Canva® e Gemini®.
+  </footer>
+
+  <script src="script/script.js"></script>
+</body>
+</html>
