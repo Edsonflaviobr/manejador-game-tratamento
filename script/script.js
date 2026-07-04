@@ -93,6 +93,7 @@ document.getElementById('start-btn').addEventListener('click', () => {
   const typedName = document.getElementById('player-name').value.trim();
   playerName = typedName || 'Profissional';
   document.getElementById('player-display').textContent = playerName;
+  stopIntroVideo();
   showScreen('game');
   loadCase(0);
   tryPlayAudio();
@@ -138,8 +139,15 @@ function showScreen(name) {
     video.currentTime = 0;
     video.muted = true;
     video.play().catch(() => {});
+  } else {
+    stopIntroVideo();
   }
   updateBackToTopVisibility();
+}
+
+function stopIntroVideo() {
+  video.pause();
+  video.currentTime = 0;
 }
 
 function tryPlayAudio() {
@@ -399,8 +407,16 @@ function finishCase() {
     title: cases[currentCaseIndex].title,
     found: foundWords.size
   });
-  setFeedback('Fase concluída. Todas as condutas foram encontradas.', 'success');
-  document.getElementById('next-case').classList.add('visible');
+  const nextButton = document.getElementById('next-case');
+  nextButton.classList.remove('visible');
+  nextButton.disabled = true;
+  setFeedback('Fase concluída. Leia o feedback antes de avançar para o próximo caso.', 'success');
+
+  window.setTimeout(() => {
+    nextButton.disabled = false;
+    nextButton.classList.add('visible');
+    setFeedback('Você já pode avançar para o próximo caso.', 'success');
+  }, 6500);
 }
 
 function clearSelection(removeClasses = true) {
