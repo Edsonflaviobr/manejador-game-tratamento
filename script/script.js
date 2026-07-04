@@ -13,41 +13,21 @@ const cases = [
     title: 'Imobilidade e medo do movimento',
     risk: 'Risco moderado',
     riskClass: 'moderate',
-    size: 14,
+    size: 15,
     description: 'Paciente com dor musculoesquelética após internação prolongada, insegurança para sentar e baixa confiança funcional.',
     factors: ['Dor associada à imobilidade', 'Medo do movimento', 'Baixa autoeficácia', 'Limitação funcional'],
-    words: ['ESCUTA', 'AUTONOMIA', 'EDUCAÇÃO', 'ALONGAMENTOS', 'CONFIANÇA', 'SEGURANÇA', 'METAS', 'SEDESTAÇÃO', 'MOBILIZAÇÃO'],
+    words: ['ESCUTA', 'AUTONOMIA', 'EDUCAÇÃO', 'ALONGAMENTOS', 'CONFIANÇA', 'SEGURANÇA', 'METAS', 'SEDESTAÇÃO', 'MOBILIZAÇÃO', 'TERMOTERAPIA'],
     hint: 'Encontre palavras ligadas à recuperação funcional e à reconstrução da confiança.'
   },
   {
-    title: 'Ventilação mecânica e comunicação limitada',
-    risk: 'Risco moderado',
-    riskClass: 'moderate',
-    size: 14,
-    description: 'Paciente desperta, sem verbalização confiável, com desconforto comportamental durante procedimentos e mudança de decúbito.',
-    factors: ['Comunicação verbal limitada', 'Procedimentos dolorosos', 'Tensão muscular', 'Necessidade de articulação com equipe'],
-    words: ['HUMANIZAÇÃO', 'ADEQUAÇÃO', 'CONFORTO', 'REGISTRO', 'SEGURANÇA', 'EQUIPE', 'COMUNICAÇÃO', 'POSICIONAMENTO'],
-    hint: 'Priorize comunicação alternativa, segurança, conforto e articulação com a equipe.'
-  },
-  {
-    title: 'Dor intensa e vulnerabilidade social',
-    risk: 'Alto risco',
-    riskClass: 'high',
-    size: 15,
-    description: 'Paciente com dor intensa, sono ruim, medo de piora, distância da família e acesso irregular ao cuidado.',
-    factors: ['Dor intensa', 'Ansiedade e medo', 'Distância da rede familiar', 'Vulnerabilidade social', 'Sono prejudicado'],
-    words: ['ACOLHIMENTO', 'FAMÍLIA', 'INCLUSÃO', 'RELAXAMENTO', 'BEMESTAR', 'EDUCAÇÃO', 'HUMANIZAÇÃO', 'ESCUTA', 'ELETROTERAPIA', 'TERMOTERAPIA'],
-    hint: 'O alto risco pede integração entre sofrimento emocional, família, contexto social e cuidado humanizado.'
-  },
-  {
-    title: 'Dor persistente, crenças e trauma',
+    title: 'Dor intensa, vulnerabilidade e crenças',
     risk: 'Alto risco',
     riskClass: 'high',
     size: 16,
-    description: 'Paciente com dor persistente, experiências traumáticas anteriores, medo de procedimentos e crenças importantes sobre adoecimento.',
-    factors: ['Dor persistente', 'Histórico de trauma', 'Crenças, fé e valores relevantes', 'Baixa autoeficácia', 'Necessidade de plano integrado'],
-    words: ['CRENÇAS', 'VALORES', 'MINDFULNESS', 'INTERDISCIPLINAR', 'FAMÍLIA', 'CONFIANÇA', 'REGISTRO', 'ESCUTA', 'MOBILIZAÇÃO', 'ELETROTERAPIA'],
-    hint: 'Busque palavras que reconhecem significado, vínculo, valores e cuidado integrado.'
+    description: 'Paciente com dor intensa e persistente, medo de piora, vulnerabilidade social, distância da família e crenças importantes sobre adoecimento.',
+    factors: ['Dor intensa e persistente', 'Ansiedade e medo', 'Vulnerabilidade social', 'Crenças, fé e valores relevantes', 'Necessidade de plano integrado'],
+    words: ['ACOLHIMENTO', 'FAMÍLIA', 'INCLUSÃO', 'RELAXAMENTO', 'BEMESTAR', 'HUMANIZAÇÃO', 'ESCUTA', 'CRENÇAS', 'VALORES', 'INTERDISCIPLINAR', 'ELETROTERAPIA', 'MOBILIZAÇÃO'],
+    hint: 'O alto risco aumenta a dificuldade e integra fatores físicos, emocionais, sociais, familiares e culturais.'
   }
 ];
 
@@ -67,6 +47,7 @@ let placedWords = [];
 let foundWords = new Set();
 let selectedCells = [];
 let isSelecting = false;
+let selectionStartCell = null;
 let suppressNextClick = false;
 let results = [];
 
@@ -137,7 +118,8 @@ function showScreen(name) {
   document.body.classList.toggle('game-started', name === 'game');
   if (name === 'video') {
     video.currentTime = 0;
-    video.muted = true;
+    video.muted = false;
+    video.volume = 1;
     video.play().catch(() => {});
   } else {
     stopIntroVideo();
@@ -184,18 +166,37 @@ function loadCase(index) {
 
 function buildPuzzle(currentCase) {
   const size = currentCase.size;
-  const nextGrid = Array.from({ length: size }, () => Array(size).fill(''));
-  const nextPlacedWords = [];
   const sortedWords = [...currentCase.words].sort((a, b) => normalizeWord(b).length - normalizeWord(a).length);
 
-  sortedWords.forEach((displayWord) => {
-    const word = normalizeWord(displayWord);
-    const placement = placeWord(nextGrid, word, displayWord, size);
-    if (placement) {
-      nextPlacedWords.push(placement);
-    }
-  });
+  for (let puzzleAttempt = 0; puzzleAttempt < 80; puzzleAttempt += 1) {
+    const nextGrid = Array.from({ length: size }, () => Array(size).fill(''));
+    const nextPlacedWords = [];
 
+    sortedWords.forEach((displayWord) => {
+      const word = normalizeWord(displayWord);
+      const placement = placeWord(nextGrid, word, displayWord, size);
+      if (placement) {
+        nextPlacedWords.push(placement);
+      }
+    });
+
+    if (nextPlacedWords.length === sortedWords.length) {
+      fillEmptyCells(nextGrid, size);
+      return { grid: nextGrid, placedWords: nextPlacedWords };
+    }
+  }
+
+  const fallbackGrid = Array.from({ length: size }, () => Array(size).fill(''));
+  const fallbackPlacedWords = [];
+  sortedWords.forEach((displayWord) => {
+    const placement = placeWord(fallbackGrid, normalizeWord(displayWord), displayWord, size);
+    if (placement) fallbackPlacedWords.push(placement);
+  });
+  fillEmptyCells(fallbackGrid, size);
+  return { grid: fallbackGrid, placedWords: fallbackPlacedWords };
+}
+
+function fillEmptyCells(nextGrid, size) {
   for (let row = 0; row < size; row += 1) {
     for (let col = 0; col < size; col += 1) {
       if (!nextGrid[row][col]) {
@@ -203,8 +204,6 @@ function buildPuzzle(currentCase) {
       }
     }
   }
-
-  return { grid: nextGrid, placedWords: nextPlacedWords };
 }
 
 function placeWord(nextGrid, word, displayWord, size) {
@@ -267,11 +266,14 @@ function renderBoard(size) {
           return;
         }
         isSelecting = true;
+        selectionStartCell = cell;
         selectedCells = [];
         addCellToSelection(cell);
       });
       cell.addEventListener('pointerenter', () => {
-        if (isSelecting) addCellToSelection(cell);
+        if (isSelecting && selectionStartCell) {
+          selectLineBetween(selectionStartCell, cell);
+        }
       });
       cell.addEventListener('click', () => handleCellClick(cell));
       board.appendChild(cell);
@@ -325,11 +327,12 @@ function addCellToSelection(cell) {
 function finishSelection() {
   if (!isSelecting) return;
   isSelecting = false;
+  selectionStartCell = null;
   checkSelection();
 }
 
 function selectLineBetween(startCell, endCell) {
-  clearSelection(false);
+  clearSelection(true, false);
   const start = getCellPosition(startCell);
   const end = getCellPosition(endCell);
   const rowDiff = end.row - start.row;
@@ -353,12 +356,10 @@ function selectLineBetween(startCell, endCell) {
 function checkSelection() {
   if (!selectedCells.length) return;
   const selectedKeys = selectedCells.map(cellKey);
-  const selectedWord = selectedCells.map((cell) => cell.textContent).join('');
-  const reversedWord = [...selectedWord].reverse().join('');
   const match = placedWords.find((item) => {
     const keys = item.cells.map((cell) => `${cell.row}-${cell.col}`);
     const reversedKeys = [...keys].reverse();
-    return arraysEqual(selectedKeys, keys) || arraysEqual(selectedKeys, reversedKeys) || selectedWord === item.word || reversedWord === item.word;
+    return arraysEqual(selectedKeys, keys) || arraysEqual(selectedKeys, reversedKeys);
   });
 
   if (match && !foundWords.has(match.word)) {
@@ -413,11 +414,14 @@ function finishCase() {
   setFeedback('Fase concluída. Todas as condutas foram encontradas.', 'success');
 }
 
-function clearSelection(removeClasses = true) {
+function clearSelection(removeClasses = true, resetStart = true) {
   if (removeClasses) {
     selectedCells.forEach((cell) => cell.classList.remove('selected', 'wrong'));
   }
   selectedCells = [];
+  if (resetStart) {
+    selectionStartCell = null;
+  }
 }
 
 function showFinalScreen() {
