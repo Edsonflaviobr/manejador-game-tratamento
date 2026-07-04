@@ -408,15 +408,9 @@ function finishCase() {
     found: foundWords.size
   });
   const nextButton = document.getElementById('next-case');
-  nextButton.classList.remove('visible');
-  nextButton.disabled = true;
-  setFeedback('Fase concluída. Leia o feedback antes de avançar para o próximo caso.', 'success');
-
-  window.setTimeout(() => {
-    nextButton.disabled = false;
-    nextButton.classList.add('visible');
-    setFeedback('Você já pode avançar para o próximo caso.', 'success');
-  }, 6500);
+  nextButton.disabled = false;
+  nextButton.classList.add('visible');
+  setFeedback('Fase concluída. Todas as condutas foram encontradas.', 'success');
 }
 
 function clearSelection(removeClasses = true) {
