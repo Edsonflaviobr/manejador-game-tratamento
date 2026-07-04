@@ -728,7 +728,7 @@ h1 {
 }
 
 @media (max-width: 760px) and (orientation: portrait) {
-  #rotate-notice {
+  body.game-started #rotate-notice {
     position: fixed;
     inset: 0;
     z-index: 100;

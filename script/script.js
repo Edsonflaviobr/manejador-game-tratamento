@@ -133,6 +133,12 @@ function showScreen(name) {
   Object.values(screens).forEach((screen) => screen.classList.remove('active'));
   screens[name].classList.add('active');
   gameContainer.classList.toggle('intro-mode', name === 'intro');
+  document.body.classList.toggle('game-started', name === 'game');
+  if (name === 'video') {
+    video.currentTime = 0;
+    video.muted = true;
+    video.play().catch(() => {});
+  }
   updateBackToTopVisibility();
 }
 
