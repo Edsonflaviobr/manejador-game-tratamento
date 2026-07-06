@@ -4,6 +4,8 @@ const cases = [
     risk: 'Baixo risco',
     riskClass: 'low',
     size: 14,
+    pathTitle: 'Base do cuidado',
+    transitionText: 'O cuidado comeca pelo basico bem feito: validar, orientar, posicionar e registrar com clareza.',
     description: 'Paciente comunicativa, com dor relacionada ao procedimento e boa compreensão das orientações.',
     factors: ['Dor procedural recente', 'Comunicação preservada', 'Ansiedade leve ao movimento', 'Rede familiar presente'],
     words: ['VALIDAÇÃO', 'COMUNICAÇÃO', 'CONFORTO', 'RESPIRAÇÃO', 'METAS', 'REGISTRO', 'POSICIONAMENTO'],
@@ -14,6 +16,8 @@ const cases = [
     risk: 'Risco moderado',
     riskClass: 'moderate',
     size: 15,
+    pathTitle: 'Integracao funcional',
+    transitionText: 'Agora o plano precisa conectar dor, movimento, seguranca e confianca funcional.',
     description: 'Paciente com dor musculoesquelética após internação prolongada, insegurança para sentar e baixa confiança funcional.',
     factors: ['Dor associada à imobilidade', 'Medo do movimento', 'Baixa autoeficácia', 'Limitação funcional'],
     words: ['ESCUTA', 'AUTONOMIA', 'EDUCAÇÃO', 'ALONGAMENTOS', 'CONFIANÇA', 'SEGURANÇA', 'METAS', 'SEDESTAÇÃO', 'MOBILIZAÇÃO', 'TERMOTERAPIA'],
@@ -24,12 +28,16 @@ const cases = [
     risk: 'Alto risco',
     riskClass: 'high',
     size: 16,
+    pathTitle: 'Cuidado ampliado',
+    transitionText: 'Neste caso, a dor nao esta sozinha: ela atravessa medo, valores, familia, contexto social e equipe.',
     description: 'Paciente com dor intensa e persistente, medo de piora, vulnerabilidade social, distância da família e crenças importantes sobre adoecimento.',
     factors: ['Dor intensa e persistente', 'Ansiedade e medo', 'Vulnerabilidade social', 'Crenças, fé e valores relevantes', 'Necessidade de plano integrado'],
     words: ['ACOLHIMENTO', 'FAMÍLIA', 'INCLUSÃO', 'RELAXAMENTO', 'BEMESTAR', 'HUMANIZAÇÃO', 'ESCUTA', 'CRENÇAS', 'VALORES', 'INTERDISCIPLINAR', 'ELETROTERAPIA', 'MOBILIZAÇÃO'],
     hint: 'O alto risco aumenta a dificuldade e integra fatores físicos, emocionais, sociais, familiares e culturais.'
   }
 ];
+
+const pathSteps = ['Base do cuidado', 'Integracao funcional', 'Cuidado ampliado'];
 
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const directions = [
@@ -63,8 +71,21 @@ const logo = document.getElementById('logo');
 const video = document.getElementById('intro-video');
 const videoFallback = document.getElementById('video-fallback');
 const bgAudio = document.getElementById('sound-bg');
+const correctAudio = new Audio('audio/certo.mp3');
+const victoryAudio = new Audio('audio/vitoria.mp3');
+const phaseVoiceAudios = [
+  new Audio('audio/voz01.mp3'),
+  new Audio('audio/voz02.mp3')
+];
 const backToTopButton = document.getElementById('back-to-top');
 const board = document.getElementById('word-search');
+const phaseModal = document.getElementById('phase-modal');
+const phaseModalMessage = document.getElementById('phase-modal-message');
+const phaseModalButton = document.getElementById('phase-modal-btn');
+const phaseMessages = [
+  'Parabéns, você achou os manejos para esse paciente. E agora vamos para o próximo! A extratificação de risco agora é um pouco maior. Boa sorte.',
+  'Você está evoluindo muito bem! Vamos para o paciente mais difícil agora. Não perca tempo.'
+];
 
 document.getElementById('case-total').textContent = cases.length;
 
@@ -88,7 +109,11 @@ document.getElementById('next-case').addEventListener('click', () => {
   }
 });
 
-document.getElementById('clear-selection').addEventListener('click', clearSelection);
+phaseModalButton.addEventListener('click', () => {
+  const nextIndex = Number(phaseModalButton.dataset.nextIndex);
+  closePhaseModal();
+  loadCase(nextIndex);
+});
 
 logo.addEventListener('error', () => {
   logo.style.display = 'none';
@@ -137,10 +162,47 @@ function tryPlayAudio() {
   bgAudio.play().catch(() => {});
 }
 
+function playEffect(audio, volume = 0.78) {
+  audio.pause();
+  audio.currentTime = 0;
+  audio.volume = volume;
+  audio.play().catch(() => {});
+}
+
+function playVictoryThenVoice(voiceAudio) {
+  victoryAudio.pause();
+  victoryAudio.currentTime = 0;
+  victoryAudio.volume = 0.85;
+  victoryAudio.onended = null;
+  victoryAudio.play().catch(() => {});
+
+  if (voiceAudio) {
+    playEffect(voiceAudio, 0.95);
+  }
+}
+
+function closePhaseModal() {
+  phaseModal.classList.remove('active');
+  phaseModal.setAttribute('aria-hidden', 'true');
+  phaseVoiceAudios.forEach((audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+}
+
+function showPhaseModal(nextIndex) {
+  const messageIndex = nextIndex - 1;
+  phaseModalMessage.textContent = phaseMessages[messageIndex];
+  phaseModalButton.dataset.nextIndex = String(nextIndex);
+  phaseModal.classList.add('active');
+  phaseModal.setAttribute('aria-hidden', 'false');
+}
+
 function loadCase(index) {
   currentCaseIndex = index;
   foundWords = new Set();
   selectedCells = [];
+  closePhaseModal();
   const currentCase = cases[index];
   const puzzle = buildPuzzle(currentCase);
   grid = puzzle.grid;
@@ -160,8 +222,18 @@ function loadCase(index) {
 
   renderBoard(currentCase.size);
   renderWordList();
+  updatePath(index);
   updateScore();
   setFeedback('Clique na primeira e na última letra, ou arraste sobre a palavra.', 'neutral');
+}
+
+function updatePath(activeIndex) {
+  document.querySelectorAll('.path-step').forEach((step) => {
+    const index = Number(step.dataset.pathStep);
+    if (Number.isNaN(index)) return;
+    step.classList.toggle('active', index === activeIndex);
+    step.classList.toggle('done', index < activeIndex);
+  });
 }
 
 function buildPuzzle(currentCase) {
@@ -387,6 +459,8 @@ function markFound(match) {
   document.getElementById('found-count').textContent = foundWords.size;
   setFeedback(`Boa! Você encontrou ${match.displayWord}.`, 'success');
 
+  playEffect(correctAudio, 0.72);
+
   if (foundWords.size === cases[currentCaseIndex].words.length) {
     finishCase();
   }
@@ -408,10 +482,18 @@ function finishCase() {
     title: cases[currentCaseIndex].title,
     found: foundWords.size
   });
+  setFeedback('Fase concluída. Todas as condutas foram encontradas.', 'success');
+  const nextIndex = currentCaseIndex + 1;
+  if (nextIndex < cases.length) {
+    showPhaseModal(nextIndex);
+    playVictoryThenVoice(phaseVoiceAudios[currentCaseIndex]);
+    return;
+  }
+
   const nextButton = document.getElementById('next-case');
   nextButton.disabled = false;
   nextButton.classList.add('visible');
-  setFeedback('Fase concluída. Todas as condutas foram encontradas.', 'success');
+  playVictoryThenVoice();
 }
 
 function clearSelection(removeClasses = true, resetStart = true) {

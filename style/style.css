@@ -215,7 +215,7 @@ h1 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 15px;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .panel-card {
@@ -226,6 +226,67 @@ h1 {
   font-weight: 900;
   background: var(--purple-100);
   box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.07);
+}
+
+#care-path {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+#care-path {
+  margin-bottom: 18px;
+}
+
+.path-step {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 2px solid #dcecf1;
+  color: #5b737c;
+  background: #f8fbfd;
+}
+
+.path-step span {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: #45626b;
+  background: #dfeaf0;
+  font-weight: 900;
+}
+
+.path-step strong {
+  font-size: 0.9rem;
+  line-height: 1.15;
+}
+
+.path-step.active {
+  border-color: var(--cyan-600);
+  color: var(--teal-700);
+  background: var(--cyan-50);
+}
+
+.path-step.active span {
+  color: white;
+  background: var(--cyan-600);
+}
+
+.path-step.done {
+  border-color: #9ad5a1;
+  color: var(--green-700);
+  background: #eff9f0;
+}
+
+.path-step.done span {
+  color: white;
+  background: var(--green-700);
 }
 
 #clinical-layout {
@@ -378,6 +439,68 @@ h1 {
   align-items: center;
 }
 
+.phase-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  place-items: center;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 25% 20%, rgba(61, 217, 232, 0.24), transparent 32%),
+    radial-gradient(circle at 75% 80%, rgba(125, 92, 255, 0.22), transparent 30%),
+    rgba(5, 30, 62, 0.78);
+  backdrop-filter: blur(6px);
+}
+
+.phase-modal.active {
+  display: grid;
+}
+
+.phase-modal-card {
+  width: min(720px, 100%);
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: clamp(26px, 5vw, 44px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: white;
+  text-align: center;
+  background:
+    linear-gradient(135deg, rgba(12, 76, 154, 0.96), rgba(9, 122, 151, 0.96)),
+    #0b4d8e;
+  box-shadow: 0 28px 70px rgba(0, 18, 44, 0.42);
+}
+
+.phase-modal-card .eyebrow,
+.phase-modal-card h2,
+.phase-modal-card p {
+  color: white;
+}
+
+.phase-modal-card .eyebrow {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.phase-modal-card h2 {
+  font-size: clamp(1.85rem, 4vw, 3rem);
+  line-height: 1.05;
+}
+
+.phase-modal-card p {
+  max-width: 58ch;
+  font-size: clamp(1.08rem, 2.4vw, 1.35rem);
+  line-height: 1.55;
+  font-weight: 800;
+}
+
+.phase-modal-card .primary-btn {
+  color: #08305d;
+  background: white;
+  box-shadow: 0 14px 28px rgba(0, 22, 52, 0.26);
+}
+
 #game-board {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
@@ -486,15 +609,6 @@ h1 {
   font-size: 0.72rem;
   font-weight: 800;
   text-decoration: none;
-}
-
-#clear-selection {
-  min-height: 38px;
-  border-radius: 999px;
-  color: var(--purple-900);
-  background: var(--purple-100);
-  font-weight: 900;
-  cursor: pointer;
 }
 
 #feedback {
@@ -654,6 +768,24 @@ h1 {
     margin-bottom: 10px;
   }
 
+  #care-path {
+    gap: 7px;
+  }
+
+  .path-step {
+    min-height: 42px;
+    padding: 7px 8px;
+  }
+
+  .path-step span {
+    width: 26px;
+    height: 26px;
+  }
+
+  .path-step strong {
+    font-size: 0.72rem;
+  }
+
   .panel-card {
     padding: 8px;
     font-size: 0.8rem;
@@ -782,6 +914,7 @@ h1 {
   }
 
   #top-panel,
+  #care-path,
   #final-breakdown {
     grid-template-columns: 1fr;
   }

@@ -58,6 +58,21 @@
         <div class="panel-card">Encontradas: <span id="found-count">0</span>/<span id="word-total">0</span></div>
       </div>
 
+      <div id="care-path" aria-label="Percurso do cuidado">
+        <div class="path-step active" data-path-step="0">
+          <span>1</span>
+          <strong>Base do cuidado</strong>
+        </div>
+        <div class="path-step" data-path-step="1">
+          <span>2</span>
+          <strong>Integração funcional</strong>
+        </div>
+        <div class="path-step" data-path-step="2">
+          <span>3</span>
+          <strong>Cuidado ampliado</strong>
+        </div>
+      </div>
+
       <div id="clinical-layout">
         <aside id="patient-card">
           <span class="eyebrow">Paciente já avaliado</span>
@@ -91,10 +106,18 @@
               <h3>Palavras para encontrar</h3>
               <p id="hint-text"></p>
               <div id="word-list"></div>
-              <button id="clear-selection" type="button">Limpar seleção</button>
             </aside>
           </div>
         </main>
+      </div>
+
+      <div id="phase-modal" class="phase-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="phase-modal-title">
+        <div class="phase-modal-card">
+          <span class="eyebrow">Próximo desafio</span>
+          <h2 id="phase-modal-title">Parabéns!</h2>
+          <p id="phase-modal-message"></p>
+          <button id="phase-modal-btn" class="primary-btn" type="button">IR PARA O PRÓXIMO PACIENTE</button>
+        </div>
       </div>
 
       <div id="feedback" role="status">Leia o caso e encontre as condutas na grade.</div>
