@@ -95,7 +95,7 @@ const instructionsButton = document.getElementById('instructions-btn');
 const instructionsClose = document.getElementById('instructions-close');
 const readCaseButton = document.getElementById('read-case-btn');
 const phaseMessages = [
-  'Parabéns, você achou os manejos para esse paciente. E agora vamos para o próximo! A extratificação de risco agora é um pouco maior. Boa sorte.',
+  'Parabéns, você achou os manejos para esse paciente. E agora vamos para o próximo! A estratificação de risco agora é um pouco maior. Boa sorte.',
   'Você está evoluindo muito bem! Vamos para o paciente mais difícil agora. Não perca tempo.'
 ];
 
