@@ -73,6 +73,7 @@ const videoFallback = document.getElementById('video-fallback');
 const bgAudio = document.getElementById('sound-bg');
 const correctAudio = new Audio('audio/certo.mp3');
 const victoryAudio = new Audio('audio/vitoria.mp3');
+const finalAudio = new Audio('audio/final.mp3');
 const phaseVoiceAudios = [
   new Audio('audio/voz01.mp3'),
   new Audio('audio/voz02.mp3')
@@ -82,6 +83,8 @@ const board = document.getElementById('word-search');
 const phaseModal = document.getElementById('phase-modal');
 const phaseModalMessage = document.getElementById('phase-modal-message');
 const phaseModalButton = document.getElementById('phase-modal-btn');
+const phaseStars = document.getElementById('phase-stars');
+const finalStars = document.getElementById('final-stars');
 const phaseMessages = [
   'Parabéns, você achou os manejos para esse paciente. E agora vamos para o próximo! A extratificação de risco agora é um pouco maior. Boa sorte.',
   'Você está evoluindo muito bem! Vamos para o paciente mais difícil agora. Não perca tempo.'
@@ -193,9 +196,17 @@ function closePhaseModal() {
 function showPhaseModal(nextIndex) {
   const messageIndex = nextIndex - 1;
   phaseModalMessage.textContent = phaseMessages[messageIndex];
+  renderStars(phaseStars, nextIndex);
   phaseModalButton.dataset.nextIndex = String(nextIndex);
   phaseModal.classList.add('active');
   phaseModal.setAttribute('aria-hidden', 'false');
+}
+
+function renderStars(target, activeCount) {
+  target.innerHTML = Array.from({ length: 3 }, (_, index) => {
+    const className = index < activeCount ? 'star lit' : 'star dim';
+    return `<span class="${className}" aria-hidden="true">★</span>`;
+  }).join('');
 }
 
 function loadCase(index) {
@@ -490,10 +501,8 @@ function finishCase() {
     return;
   }
 
-  const nextButton = document.getElementById('next-case');
-  nextButton.disabled = false;
-  nextButton.classList.add('visible');
-  playVictoryThenVoice();
+  playEffect(finalAudio, 0.9);
+  showFinalScreen();
 }
 
 function clearSelection(removeClasses = true, resetStart = true) {
@@ -510,13 +519,11 @@ function showFinalScreen() {
   showScreen('final');
   const totalWords = cases.reduce((sum, item) => sum + item.words.length, 0);
   const foundTotal = results.reduce((sum, item) => sum + item.found, 0);
-  const title = foundTotal === totalWords
-    ? 'Caça-palavras concluído com ótimo repertório'
-    : 'Caça-palavras concluído';
 
-  document.getElementById('final-title').textContent = title;
+  renderStars(finalStars, 3);
+  document.getElementById('final-title').textContent = 'Parabéns, fisioterapeuta você agora sabe manejar a dor na UTI Adulto.';
   document.getElementById('final-message').textContent =
-    `${playerName}, sua pontuação final foi ${score}. A proposta é fixar visualmente condutas adequadas a cada risco e conjunto de fatores.`;
+    `${playerName}, sua pontuação final foi ${score}.`;
   document.getElementById('final-breakdown').innerHTML = `
     <div class="final-card"><strong>${foundTotal}</strong><span>Palavras encontradas</span></div>
     <div class="final-card"><strong>${totalWords}</strong><span>Palavras no total</span></div>
