@@ -148,6 +148,97 @@ h1 {
   transform: translateY(-2px);
 }
 
+.secondary-btn {
+  min-height: 48px;
+  border-radius: 15px;
+  padding: 12px 24px;
+  color: var(--blue-900);
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.25s ease;
+  background: white;
+  border: 2px solid rgba(13, 71, 161, 0.22);
+  box-shadow: 0 10px 22px rgba(13, 71, 161, 0.12);
+}
+
+.secondary-btn:hover {
+  transform: translateY(-2px);
+}
+
+.video-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.instructions-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  place-items: center;
+  padding: 20px;
+  background: rgba(5, 30, 62, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.instructions-modal.active {
+  display: grid;
+}
+
+.instructions-card {
+  position: relative;
+  width: min(720px, 100%);
+  max-height: min(82vh, 620px);
+  overflow-y: auto;
+  display: grid;
+  gap: 14px;
+  padding: clamp(24px, 5vw, 38px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: white;
+  text-align: left;
+  background:
+    radial-gradient(circle at 18% 16%, rgba(173, 232, 244, 0.28), transparent 34%),
+    linear-gradient(135deg, rgba(46, 109, 172, 0.94), rgba(47, 143, 162, 0.94));
+  box-shadow: 0 24px 56px rgba(0, 18, 44, 0.28);
+}
+
+.instructions-card h2,
+.instructions-card p,
+.instructions-card .eyebrow {
+  color: white;
+}
+
+.instructions-card h2 {
+  font-size: clamp(1.55rem, 4vw, 2.45rem);
+  line-height: 1.12;
+  font-weight: 900;
+}
+
+.instructions-scroll {
+  display: grid;
+  gap: 14px;
+  font-size: clamp(1rem, 2.4vw, 1.18rem);
+  line-height: 1.62;
+  font-weight: 400;
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #08305d;
+  background: white;
+  font-size: 1.55rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 #intro-video {
   width: 90%;
   max-width: 760px;
@@ -310,7 +401,8 @@ h1 {
   grid-template-columns: minmax(280px, 1.25fr) minmax(260px, 1fr) 190px;
   grid-template-areas:
     "title factors meta"
-    "desc factors risk";
+    "desc factors risk"
+    "read factors risk";
   gap: 8px 22px;
   align-items: start;
 }
@@ -346,6 +438,31 @@ h1 {
   color: var(--muted);
   font-size: 0.94rem;
   line-height: 1.35;
+}
+
+.read-case-btn {
+  grid-area: read;
+  width: fit-content;
+  min-height: 36px;
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--blue-900);
+  background: #e8f3fb;
+  border: 1px solid #b9d8e8;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.read-case-btn:hover {
+  transform: translateY(-1px);
+  background: #d9edf8;
+}
+
+.read-case-btn.playing {
+  color: white;
+  background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
 }
 
 .risk-strip {
@@ -468,9 +585,9 @@ h1 {
   color: white;
   text-align: center;
   background:
-    linear-gradient(135deg, rgba(12, 76, 154, 0.96), rgba(9, 122, 151, 0.96)),
-    #0b4d8e;
-  box-shadow: 0 28px 70px rgba(0, 18, 44, 0.42);
+    radial-gradient(circle at 20% 18%, rgba(173, 232, 244, 0.22), transparent 34%),
+    linear-gradient(135deg, rgba(46, 109, 172, 0.94), rgba(47, 143, 162, 0.94));
+  box-shadow: 0 24px 56px rgba(0, 18, 44, 0.28);
 }
 
 .phase-modal-card .eyebrow,
@@ -519,13 +636,14 @@ h1 {
 .phase-modal-card h2 {
   font-size: clamp(1.85rem, 4vw, 3rem);
   line-height: 1.05;
+  font-weight: 900;
 }
 
 .phase-modal-card p {
   max-width: 58ch;
   font-size: clamp(1.08rem, 2.4vw, 1.35rem);
   line-height: 1.55;
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .phase-modal-card .primary-btn {
@@ -679,10 +797,10 @@ h1 {
   border: 1px solid rgba(255, 255, 255, 0.28);
   color: white;
   background:
-    radial-gradient(circle at 18% 18%, rgba(61, 217, 232, 0.26), transparent 30%),
-    radial-gradient(circle at 82% 76%, rgba(255, 216, 90, 0.18), transparent 28%),
-    linear-gradient(135deg, rgba(12, 76, 154, 0.98), rgba(9, 122, 151, 0.98));
-  box-shadow: 0 28px 70px rgba(0, 18, 44, 0.34);
+    radial-gradient(circle at 18% 18%, rgba(173, 232, 244, 0.28), transparent 30%),
+    radial-gradient(circle at 82% 76%, rgba(255, 216, 90, 0.15), transparent 28%),
+    linear-gradient(135deg, rgba(46, 109, 172, 0.94), rgba(47, 143, 162, 0.94));
+  box-shadow: 0 24px 56px rgba(0, 18, 44, 0.24);
 }
 
 #final-screen h1,
@@ -694,11 +812,12 @@ h1 {
   max-width: 760px;
   font-size: clamp(1.8rem, 4vw, 3rem);
   line-height: 1.12;
+  font-weight: 900;
 }
 
 #final-screen .intro-text {
   font-size: clamp(1.05rem, 2.2vw, 1.35rem);
-  font-weight: 800;
+  font-weight: 400;
 }
 
 #final-screen .primary-btn {
@@ -974,9 +1093,43 @@ h1 {
     padding: 12px;
   }
 
+  .video-actions {
+    width: 100%;
+    display: grid;
+  }
+
+  .video-actions .primary-btn,
+  .video-actions .secondary-btn {
+    width: 100%;
+  }
+
+  .instructions-modal {
+    padding: 12px;
+  }
+
+  .instructions-card {
+    max-height: 86vh;
+    border-radius: 18px;
+  }
+
   #game-container {
     padding: 18px;
     border-radius: 22px;
+  }
+
+  #patient-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "meta"
+      "title"
+      "desc"
+      "read"
+      "risk"
+      "factors";
+  }
+
+  .read-case-btn {
+    width: 100%;
   }
 
   h1 {

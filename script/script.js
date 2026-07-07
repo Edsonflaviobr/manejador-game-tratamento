@@ -74,6 +74,11 @@ const bgAudio = document.getElementById('sound-bg');
 const correctAudio = new Audio('audio/certo.mp3');
 const victoryAudio = new Audio('audio/vitoria.mp3');
 const finalAudio = new Audio('audio/final.mp3');
+const caseAudios = [
+  new Audio('audio/caso1.mp3'),
+  new Audio('audio/caso2.mp3'),
+  new Audio('audio/caso3.mp3')
+];
 const phaseVoiceAudios = [
   new Audio('audio/voz01.mp3'),
   new Audio('audio/voz02.mp3')
@@ -85,14 +90,41 @@ const phaseModalMessage = document.getElementById('phase-modal-message');
 const phaseModalButton = document.getElementById('phase-modal-btn');
 const phaseStars = document.getElementById('phase-stars');
 const finalStars = document.getElementById('final-stars');
+const instructionsModal = document.getElementById('instructions-modal');
+const instructionsButton = document.getElementById('instructions-btn');
+const instructionsClose = document.getElementById('instructions-close');
+const readCaseButton = document.getElementById('read-case-btn');
 const phaseMessages = [
-  'Parabéns, você achou os manejos para esse paciente. E agora vamos para o próximo! A estratificação de risco agora é um pouco maior. Boa sorte.',
+  'Parabéns, você achou os manejos para esse paciente. E agora vamos para o próximo! A extratificação de risco agora é um pouco maior. Boa sorte.',
   'Você está evoluindo muito bem! Vamos para o paciente mais difícil agora. Não perca tempo.'
 ];
 
 document.getElementById('case-total').textContent = cases.length;
 
 document.getElementById('start-intro-btn').addEventListener('click', () => showScreen('video'));
+
+readCaseButton.addEventListener('click', () => {
+  playCaseAudio(currentCaseIndex);
+});
+
+instructionsButton.addEventListener('click', () => {
+  instructionsModal.classList.add('active');
+  instructionsModal.setAttribute('aria-hidden', 'false');
+});
+
+instructionsClose.addEventListener('click', closeInstructions);
+
+instructionsModal.addEventListener('click', (event) => {
+  if (event.target === instructionsModal) {
+    closeInstructions();
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && instructionsModal.classList.contains('active')) {
+    closeInstructions();
+  }
+});
 
 document.getElementById('start-btn').addEventListener('click', () => {
   const typedName = document.getElementById('player-name').value.trim();
@@ -172,6 +204,33 @@ function playEffect(audio, volume = 0.78) {
   audio.play().catch(() => {});
 }
 
+function stopCaseAudios() {
+  caseAudios.forEach((audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+  readCaseButton.classList.remove('playing');
+  readCaseButton.textContent = 'LER O CASO';
+}
+
+function playCaseAudio(index) {
+  const audio = caseAudios[index];
+  if (!audio) return;
+
+  stopCaseAudios();
+  audio.volume = 0.95;
+  readCaseButton.classList.add('playing');
+  readCaseButton.textContent = 'OUVINDO...';
+  audio.onended = () => {
+    readCaseButton.classList.remove('playing');
+    readCaseButton.textContent = 'LER O CASO';
+  };
+  audio.play().catch(() => {
+    readCaseButton.classList.remove('playing');
+    readCaseButton.textContent = 'LER O CASO';
+  });
+}
+
 function playVictoryThenVoice(voiceAudio) {
   victoryAudio.pause();
   victoryAudio.currentTime = 0;
@@ -191,6 +250,11 @@ function closePhaseModal() {
     audio.pause();
     audio.currentTime = 0;
   });
+}
+
+function closeInstructions() {
+  instructionsModal.classList.remove('active');
+  instructionsModal.setAttribute('aria-hidden', 'true');
 }
 
 function showPhaseModal(nextIndex) {
@@ -214,6 +278,7 @@ function loadCase(index) {
   foundWords = new Set();
   selectedCells = [];
   closePhaseModal();
+  stopCaseAudios();
   const currentCase = cases[index];
   const puzzle = buildPuzzle(currentCase);
   grid = puzzle.grid;
@@ -516,6 +581,7 @@ function clearSelection(removeClasses = true, resetStart = true) {
 }
 
 function showFinalScreen() {
+  stopCaseAudios();
   showScreen('final');
   const totalWords = cases.reduce((sum, item) => sum + item.words.length, 0);
   const foundTotal = results.reduce((sum, item) => sum + item.found, 0);

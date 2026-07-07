@@ -47,8 +47,30 @@
       </p>
 
       <input type="text" id="player-name" maxlength="28" placeholder="Digite seu nome">
-      <button id="start-btn" class="primary-btn">CONTINUAR</button>
+      <div class="video-actions">
+        <button id="start-btn" class="primary-btn">CONTINUAR</button>
+        <button id="instructions-btn" class="secondary-btn" type="button">LER INSTRUÇÕES</button>
+      </div>
     </section>
+
+    <div id="instructions-modal" class="instructions-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="instructions-title">
+      <div class="instructions-card">
+        <button id="instructions-close" class="modal-close" type="button" aria-label="Fechar instruções">×</button>
+        <span class="eyebrow">Como jogar</span>
+        <h2 id="instructions-title">Instruções do caça-palavras</h2>
+        <div class="instructions-scroll">
+          <p>
+            Leia o caso já avaliado ou clique no botão ler o caso para ouvir em áudio e depois cace todos os manejos indicados para ele.
+          </p>
+          <p>
+            Faça isso com os três casos, cada um com um risco maior e, consequentemente, maior terá que ser sua caçada.
+          </p>
+          <p>
+            Para marcar uma palavra, clique na primeira letra e depois na última, ou arraste sobre a palavra. Boa sorte.
+          </p>
+        </div>
+      </div>
+    </div>
 
     <section id="game-area" class="screen">
       <div id="top-panel">
@@ -78,6 +100,7 @@
           <span class="eyebrow">Paciente já avaliado</span>
           <h2 id="patient-title"></h2>
           <p id="patient-description"></p>
+          <button id="read-case-btn" class="read-case-btn" type="button">LER O CASO</button>
 
           <div class="risk-strip">
             <small>Estratificação</small>
