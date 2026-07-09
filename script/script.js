@@ -6,7 +6,7 @@ const cases = [
     size: 14,
     pathTitle: 'Base do cuidado',
     transitionText: 'O cuidado comeca pelo basico bem feito: validar, orientar, posicionar e registrar com clareza.',
-    description: 'Paciente comunicativa, com dor relacionada ao procedimento e boa compreensão das orientações.',
+    description: 'Paciente comunicativa, com dor relacionada ao procedimento de desbridamento e boa compreensão das orientações.',
     factors: ['Dor procedural recente', 'Comunicação preservada', 'Ansiedade leve ao movimento', 'Rede familiar presente'],
     words: ['VALIDAÇÃO', 'COMUNICAÇÃO', 'CONFORTO', 'RESPIRAÇÃO', 'METAS', 'REGISTRO', 'POSICIONAMENTO'],
     hint: 'Procure condutas básicas e proporcionais para um caso de baixo risco.'
@@ -18,9 +18,9 @@ const cases = [
     size: 15,
     pathTitle: 'Integracao funcional',
     transitionText: 'Agora o plano precisa conectar dor, movimento, seguranca e confianca funcional.',
-    description: 'Paciente com dor musculoesquelética após internação prolongada, insegurança para sentar e baixa confiança funcional.',
+    description: 'Paciente com dor musculoesquelética após internação prolongada por pneumonia, insegurança para sentar e baixa confiança funcional.',
     factors: ['Dor associada à imobilidade', 'Medo do movimento', 'Baixa autoeficácia', 'Limitação funcional'],
-    words: ['ESCUTA', 'AUTONOMIA', 'EDUCAÇÃO', 'ALONGAMENTOS', 'CONFIANÇA', 'SEGURANÇA', 'METAS', 'SEDESTAÇÃO', 'MOBILIZAÇÃO', 'TERMOTERAPIA'],
+    words: ['ESCUTA', 'AUTONOMIA', 'EDUCAÇÃO', 'ALONGAMENTOS', 'CONFIANÇA', 'SEGURANÇA', 'METAS', 'SEDESTAÇÃO', 'MOBILIZAÇÃO', 'AMBIENTAL'],
     hint: 'Encontre palavras ligadas à recuperação funcional e à reconstrução da confiança.'
   },
   {
@@ -30,9 +30,9 @@ const cases = [
     size: 16,
     pathTitle: 'Cuidado ampliado',
     transitionText: 'Neste caso, a dor nao esta sozinha: ela atravessa medo, valores, familia, contexto social e equipe.',
-    description: 'Paciente com dor intensa e persistente, medo de piora, vulnerabilidade social, distância da família e crenças importantes sobre adoecimento.',
+    description: 'Paciente com dor intensa e persistente devido dreno de tórax, medo de piora, vulnerabilidade social, distância da família e crenças importantes sobre adoecimento.',
     factors: ['Dor intensa e persistente', 'Ansiedade e medo', 'Vulnerabilidade social', 'Crenças, fé e valores relevantes', 'Necessidade de plano integrado'],
-    words: ['ACOLHIMENTO', 'FAMÍLIA', 'INCLUSÃO', 'RELAXAMENTO', 'BEMESTAR', 'HUMANIZAÇÃO', 'ESCUTA', 'CRENÇAS', 'VALORES', 'INTERDISCIPLINAR', 'ELETROTERAPIA', 'MOBILIZAÇÃO'],
+    words: ['ACOLHIMENTO', 'FAMÍLIA', 'INCLUSÃO', 'RELAXAMENTO', 'REGISTRO', 'HUMANIZAÇÃO', 'ESCUTA', 'CRENÇAS', 'VALORES', 'INTERDISCIPLINAR', 'ELETROTERAPIA', 'MOBILIZAÇÃO'],
     hint: 'O alto risco aumenta a dificuldade e integra fatores físicos, emocionais, sociais, familiares e culturais.'
   }
 ];
@@ -49,7 +49,6 @@ const directions = [
 
 let playerName = 'Profissional';
 let currentCaseIndex = 0;
-let score = 0;
 let grid = [];
 let placedWords = [];
 let foundWords = new Set();
@@ -58,6 +57,11 @@ let isSelecting = false;
 let selectionStartCell = null;
 let suppressNextClick = false;
 let results = [];
+let motivationTimer = null;
+let motivationIndex = 0;
+let caseStartTime = 0;
+let caseTimer = null;
+let caseTimes = [];
 
 const screens = {
   intro: document.getElementById('intro'),
@@ -79,6 +83,12 @@ const caseAudios = [
   new Audio('audio/caso2.mp3'),
   new Audio('audio/caso3.mp3')
 ];
+const motivationAudios = [
+  new Audio('audio/motivacao.mp3'),
+  new Audio('audio/motivacao2.mp3'),
+  new Audio('audio/motivacao3.mp3')
+];
+const motivationEffectAudio = new Audio('audio/efeitomot.mp3');
 const phaseVoiceAudios = [
   new Audio('audio/voz01.mp3'),
   new Audio('audio/voz02.mp3')
@@ -94,10 +104,42 @@ const instructionsModal = document.getElementById('instructions-modal');
 const instructionsButton = document.getElementById('instructions-btn');
 const instructionsClose = document.getElementById('instructions-close');
 const readCaseButton = document.getElementById('read-case-btn');
+const keywordModal = document.getElementById('keyword-modal');
+const keywordModalTitle = document.getElementById('keyword-modal-title');
+const keywordModalText = document.getElementById('keyword-modal-text');
+const keywordClose = document.getElementById('keyword-close');
 const phaseMessages = [
-  'Parabéns, você achou os manejos para esse paciente. E agora vamos para o próximo! A estratificação de risco agora é um pouco maior. Boa sorte.',
+  'Você achou os manejos para esse paciente. E agora vamos para o próximo! A extratificação de risco agora é um pouco maior. Boa sorte.',
   'Você está evoluindo muito bem! Vamos para o paciente mais difícil agora. Não perca tempo.'
 ];
+const keywordExplanations = {
+  SEGURANCA: 'Priorize a segurança do paciente, respeitando contraindicações e monitorando riscos durante todas as intervenções.',
+  POSICIONAMENTO: 'Realize posicionamentos adequados para promover conforto, prevenir complicações e reduzir a dor.',
+  ACOLHIMENTO: 'Acolha o paciente com respeito e empatia, reconhecendo sua dor e necessidades.',
+  ELETROTERAPIA: 'Utilize recursos eletroterapêuticos quando indicados para auxiliar no controle da dor.',
+  AMBIENTAL: 'Adapte o ambiente para reduzir estressores, como ruídos, luminosidade e desconfortos térmicos.',
+  CONFIANCA: 'Promova um ambiente colaborativo para fortalecer a confiança entre paciente e equipe.',
+  INTERDISCIPLINAR: 'Integre diferentes profissionais para um manejo mais completo e eficaz da dor.',
+  COMUNICACAO: 'Comunique-se de forma clara e empática, certificando-se de que o paciente compreendeu as orientações.',
+  REGISTRO: 'Registre a avaliação e o manejo da dor de forma clara, completa e oportuna.',
+  VALIDACAO: 'Reconheça e valide a dor do paciente para fortalecer o vínculo e reduzir o sofrimento.',
+  METAS: 'Estabeleça metas terapêuticas específicas, realistas e voltadas à funcionalidade.',
+  CONFORTO: 'Promova conforto físico e emocional por meio de medidas simples e individualizadas.',
+  EDUCACAO: 'Oriente o paciente sobre dor e tratamento para estimular sua participação no cuidado.',
+  CRENCAS: 'Respeite as crenças e experiências do paciente durante o tratamento.',
+  VALORES: 'Considere os valores culturais e preferências individuais do paciente.',
+  MOBILIZACAO: 'Incentive a mobilização precoce conforme as condições clínicas do paciente.',
+  ALONGAMENTO: 'Utilize alongamentos para prevenir contraturas e preservar a mobilidade.',
+  ALONGAMENTOS: 'Utilize alongamentos para prevenir contraturas e preservar a mobilidade.',
+  AUTONOMIA: 'Estimule a independência funcional respeitando a capacidade do paciente.',
+  SEDESTACAO: 'Favoreça a progressão para a posição sentada sempre que clinicamente seguro.',
+  INCLUSAO: 'Envolva o paciente nas decisões e no planejamento do tratamento.',
+  FAMILIA: 'Incentive a participação da família no cuidado e na reabilitação.',
+  RELAXAMENTO: 'Utilize técnicas de relaxamento para reduzir tensão e desconforto.',
+  RESPIRACAO: 'Empregue exercícios respiratórios para promover conforto e controle da ansiedade.',
+  ESCUTA: 'Pratique escuta qualificada, valorizando as percepções e necessidades do paciente.',
+  HUMANIZACAO: 'Minimize o sofrimento durante procedimentos por meio de condutas humanizadas.'
+};
 
 document.getElementById('case-total').textContent = cases.length;
 
@@ -114,15 +156,26 @@ instructionsButton.addEventListener('click', () => {
 
 instructionsClose.addEventListener('click', closeInstructions);
 
+keywordClose.addEventListener('click', closeKeywordModal);
+
 instructionsModal.addEventListener('click', (event) => {
   if (event.target === instructionsModal) {
     closeInstructions();
   }
 });
 
+keywordModal.addEventListener('click', (event) => {
+  if (event.target === keywordModal) {
+    closeKeywordModal();
+  }
+});
+
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && instructionsModal.classList.contains('active')) {
     closeInstructions();
+  }
+  if (event.key === 'Escape' && keywordModal.classList.contains('active')) {
+    closeKeywordModal();
   }
 });
 
@@ -134,6 +187,7 @@ document.getElementById('start-btn').addEventListener('click', () => {
   showScreen('game');
   loadCase(0);
   tryPlayAudio();
+  startMotivationTimer();
 });
 
 document.getElementById('next-case').addEventListener('click', () => {
@@ -204,6 +258,39 @@ function playEffect(audio, volume = 0.78) {
   audio.play().catch(() => {});
 }
 
+function startMotivationTimer() {
+  if (motivationTimer) return;
+  motivationTimer = window.setInterval(playTimedMotivation, 60000);
+}
+
+function stopMotivationTimer() {
+  if (motivationTimer) {
+    window.clearInterval(motivationTimer);
+    motivationTimer = null;
+  }
+  stopMotivationAudios();
+}
+
+function stopMotivationAudios() {
+  motivationAudios.forEach((audio) => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+  motivationEffectAudio.pause();
+  motivationEffectAudio.currentTime = 0;
+}
+
+function playTimedMotivation() {
+  if (!screens.game.classList.contains('active') || phaseModal.classList.contains('active')) {
+    return;
+  }
+
+  const audio = motivationAudios[motivationIndex % motivationAudios.length];
+  motivationIndex += 1;
+  playEffect(motivationEffectAudio, 0.72);
+  playEffect(audio, 0.92);
+}
+
 function stopCaseAudios() {
   caseAudios.forEach((audio) => {
     audio.pause();
@@ -257,9 +344,27 @@ function closeInstructions() {
   instructionsModal.setAttribute('aria-hidden', 'true');
 }
 
+function showKeywordModal(word) {
+  const key = normalizeWord(word);
+  const explanation = keywordExplanations[key];
+  if (!explanation) return;
+
+  keywordModalTitle.textContent = word;
+  keywordModalText.textContent = explanation;
+  keywordModal.classList.add('active');
+  keywordModal.setAttribute('aria-hidden', 'false');
+}
+
+function closeKeywordModal() {
+  keywordModal.classList.remove('active');
+  keywordModal.setAttribute('aria-hidden', 'true');
+}
+
 function showPhaseModal(nextIndex) {
   const messageIndex = nextIndex - 1;
-  phaseModalMessage.textContent = phaseMessages[messageIndex];
+  const lastTime = caseTimes[nextIndex - 1];
+  const timeFeedback = lastTime !== undefined ? `Seu tempo foi de ${formatElapsed(lastTime)}. ` : '';
+  phaseModalMessage.textContent = `${timeFeedback}${phaseMessages[messageIndex]}`;
   renderStars(phaseStars, nextIndex);
   phaseModalButton.dataset.nextIndex = String(nextIndex);
   phaseModal.classList.add('active');
@@ -271,6 +376,41 @@ function renderStars(target, activeCount) {
     const className = index < activeCount ? 'star lit' : 'star dim';
     return `<span class="${className}" aria-hidden="true">★</span>`;
   }).join('');
+}
+
+function formatClock(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+
+function formatElapsed(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  if (minutes > 0) {
+    return `${minutes}min ${String(seconds).padStart(2, '0')}s`;
+  }
+  return `${seconds}s`;
+}
+
+function updateCaseTimer() {
+  document.getElementById('time-display').textContent = formatClock(Date.now() - caseStartTime);
+}
+
+function startCaseTimer() {
+  stopCaseTimer();
+  caseStartTime = Date.now();
+  updateCaseTimer();
+  caseTimer = window.setInterval(updateCaseTimer, 1000);
+}
+
+function stopCaseTimer() {
+  if (caseTimer) {
+    window.clearInterval(caseTimer);
+    caseTimer = null;
+  }
 }
 
 function loadCase(index) {
@@ -299,7 +439,7 @@ function loadCase(index) {
   renderBoard(currentCase.size);
   renderWordList();
   updatePath(index);
-  updateScore();
+  startCaseTimer();
   setFeedback('Clique na primeira e na última letra, ou arraste sobre a palavra.', 'neutral');
 }
 
@@ -435,9 +575,33 @@ function renderWordList() {
 
   cases[currentCaseIndex].words.forEach((word) => {
     const item = document.createElement('div');
+    const wordKey = normalizeWord(word);
     item.className = 'word-item';
-    item.dataset.word = normalizeWord(word);
-    item.innerHTML = `${word}<span>${normalizeWord(word).length} letras</span>`;
+    item.dataset.word = wordKey;
+
+    const label = document.createElement('span');
+    label.className = 'word-label';
+    label.textContent = word;
+
+    const meta = document.createElement('span');
+    meta.className = 'word-meta';
+    meta.textContent = `${wordKey.length} letras`;
+
+    const infoButton = document.createElement('button');
+    infoButton.className = 'keyword-info';
+    infoButton.type = 'button';
+    infoButton.setAttribute('aria-label', `Ver explicação de ${word}`);
+    infoButton.textContent = '?';
+    infoButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      showKeywordModal(word);
+    });
+
+    const details = document.createElement('div');
+    details.className = 'word-details';
+    details.append(meta, infoButton);
+
+    item.append(label, details);
     list.appendChild(item);
   });
 }
@@ -529,8 +693,6 @@ function markFound(match) {
   });
   const item = document.querySelector(`.word-item[data-word="${match.word}"]`);
   item?.classList.add('found');
-  score += 10;
-  updateScore();
   clearSelection(false);
   document.getElementById('found-count').textContent = foundWords.size;
   setFeedback(`Boa! Você encontrou ${match.displayWord}.`, 'success');
@@ -544,8 +706,6 @@ function markFound(match) {
 
 function markWrong() {
   selectedCells.forEach((cell) => cell.classList.add('wrong'));
-  score = Math.max(0, score - 2);
-  updateScore();
   setFeedback('Essa sequência não corresponde a uma conduta da lista. Tente outra direção.', 'warning');
   window.setTimeout(() => {
     selectedCells.forEach((cell) => cell.classList.remove('selected', 'wrong'));
@@ -554,11 +714,16 @@ function markWrong() {
 }
 
 function finishCase() {
+  const elapsed = Date.now() - caseStartTime;
+  stopCaseTimer();
+  stopMotivationAudios();
+  caseTimes[currentCaseIndex] = elapsed;
   results.push({
     title: cases[currentCaseIndex].title,
-    found: foundWords.size
+    found: foundWords.size,
+    timeMs: elapsed
   });
-  setFeedback('Fase concluída. Todas as condutas foram encontradas.', 'success');
+  setFeedback(`Fase concluída. Todas as condutas foram encontradas. Seu tempo foi de ${formatElapsed(elapsed)}.`, 'success');
   const nextIndex = currentCaseIndex + 1;
   if (nextIndex < cases.length) {
     showPhaseModal(nextIndex);
@@ -582,23 +747,21 @@ function clearSelection(removeClasses = true, resetStart = true) {
 
 function showFinalScreen() {
   stopCaseAudios();
+  stopCaseTimer();
+  stopMotivationTimer();
   showScreen('final');
-  const totalWords = cases.reduce((sum, item) => sum + item.words.length, 0);
   const foundTotal = results.reduce((sum, item) => sum + item.found, 0);
+  const totalTime = caseTimes.reduce((sum, time) => sum + (time || 0), 0);
+  const averageTime = totalTime / cases.length;
 
   renderStars(finalStars, 3);
   document.getElementById('final-title').textContent = 'Parabéns, fisioterapeuta você agora sabe manejar a dor na UTI Adulto.';
   document.getElementById('final-message').textContent =
-    `${playerName}, sua pontuação final foi ${score}.`;
+    `${playerName}, sua média do tempo foi de ${formatElapsed(averageTime)}.`;
   document.getElementById('final-breakdown').innerHTML = `
     <div class="final-card"><strong>${foundTotal}</strong><span>Palavras encontradas</span></div>
-    <div class="final-card"><strong>${totalWords}</strong><span>Palavras no total</span></div>
-    <div class="final-card"><strong>${score}</strong><span>Pontos</span></div>
+    <div class="final-card final-card-time"><strong>${formatElapsed(averageTime)}</strong><span>Tempo médio</span></div>
   `;
-}
-
-function updateScore() {
-  document.getElementById('score-display').textContent = score;
 }
 
 function setFeedback(message, type) {

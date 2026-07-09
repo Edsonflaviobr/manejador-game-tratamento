@@ -219,10 +219,54 @@ h1 {
 
 .instructions-scroll {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   font-size: clamp(1rem, 2.4vw, 1.18rem);
-  line-height: 1.62;
+  line-height: 1.5;
   font-weight: 400;
+}
+
+.instruction-step {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.instruction-step > strong {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #1e5b88;
+  background: white;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.instruction-step p {
+  margin: 0;
+}
+
+.instruction-step b,
+.instruction-tip b {
+  font-weight: 900;
+}
+
+.instruction-tip {
+  padding: 13px 14px;
+  border-radius: 14px;
+  color: #123d5b;
+  background: rgba(255, 255, 255, 0.86);
+  line-height: 1.5;
+}
+
+.instructions-card .instruction-tip {
+  color: #123d5b;
 }
 
 .modal-close {
@@ -402,7 +446,8 @@ h1 {
   grid-template-areas:
     "title factors meta"
     "desc factors risk"
-    "read factors risk";
+    "read factors risk"
+    "note note note";
   gap: 8px 22px;
   align-items: start;
 }
@@ -463,6 +508,18 @@ h1 {
 .read-case-btn.playing {
   color: white;
   background: linear-gradient(135deg, var(--blue-900), var(--blue-700));
+}
+
+.case-note {
+  grid-area: note;
+  margin: 2px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: #45626b;
+  background: #f3f8fb;
+  border: 1px solid #d9e9ef;
+  font-size: 0.82rem;
+  line-height: 1.4;
 }
 
 .risk-strip {
@@ -736,7 +793,8 @@ h1 {
 
 .word-item {
   min-height: 36px;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -748,6 +806,23 @@ h1 {
   font-weight: 900;
 }
 
+.word-label {
+  min-width: 0;
+  max-width: 100%;
+  line-height: 1.18;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.word-details {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .word-item.found {
   color: var(--green-700);
   border-color: #a5d6a7;
@@ -755,11 +830,88 @@ h1 {
   text-decoration: line-through;
 }
 
-.word-item span {
+.word-meta {
   color: var(--muted);
   font-size: 0.72rem;
   font-weight: 800;
   text-decoration: none;
+}
+
+.keyword-info {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  background: var(--blue-700);
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(13, 71, 161, 0.18);
+}
+
+.keyword-info:hover {
+  background: var(--blue-900);
+}
+
+.word-item.found .keyword-info {
+  text-decoration: none;
+}
+
+.keyword-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: none;
+  place-items: center;
+  padding: 18px;
+  background: rgba(5, 30, 62, 0.42);
+  backdrop-filter: blur(4px);
+}
+
+.keyword-modal.active {
+  display: grid;
+}
+
+.keyword-card {
+  position: relative;
+  width: min(420px, 100%);
+  display: grid;
+  gap: 10px;
+  padding: 24px;
+  border-radius: 18px;
+  border: 1px solid #d9e9ef;
+  color: var(--ink);
+  background: white;
+  box-shadow: 0 22px 54px rgba(0, 18, 44, 0.24);
+}
+
+.keyword-card h3 {
+  color: var(--purple-900);
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+
+.keyword-card p {
+  color: #45626b;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.keyword-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--blue-900);
+  background: #e8f3fb;
+  font-size: 1.25rem;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 #feedback {
@@ -828,7 +980,7 @@ h1 {
 
 #final-breakdown {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
   gap: 12px;
   width: 100%;
   max-width: 760px;
@@ -853,6 +1005,23 @@ h1 {
 .final-card span {
   color: rgba(255, 255, 255, 0.78);
   font-weight: 800;
+}
+
+.final-card-time {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.52);
+  box-shadow:
+    inset 0 0 22px rgba(255, 255, 255, 0.12),
+    0 16px 34px rgba(0, 18, 44, 0.18);
+}
+
+.final-card-time strong {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.final-card-time span {
+  color: white;
+  font-size: 1rem;
 }
 
 #back-to-top {
@@ -1029,9 +1198,19 @@ h1 {
   }
 
   .word-item {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
     min-height: 30px;
     padding: 6px 8px;
     font-size: 0.75rem;
+  }
+
+  .word-details {
+    justify-self: center;
+  }
+
+  .word-meta {
+    font-size: 0.66rem;
   }
 
   .primary-btn {
@@ -1125,7 +1304,8 @@ h1 {
       "desc"
       "read"
       "risk"
-      "factors";
+      "factors"
+      "note";
   }
 
   .read-case-btn {

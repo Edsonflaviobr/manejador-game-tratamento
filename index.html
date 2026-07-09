@@ -21,8 +21,8 @@
       <h1>Caça-palavras das Condutas</h1>
 
       <p class="intro-text">
-        Encontre, na grade, as condutas mais coerentes para pacientes já avaliados e com risco estratificado.
-        Cada fase apresenta um caso, seus fatores e uma lista de palavras-chave para fixação.
+        Encontre os manejos coerentes para pacientes já avaliados e com riscos estratificados.
+        Cada fase apresenta um caso e uma lista de palavras-chave referentes a manejos escolhidos para o caso. 
       </p>
 
       <button id="start-intro-btn" class="primary-btn">INICIAR JOGO</button>
@@ -38,12 +38,12 @@
         <div>
           <span class="eyebrow">Introdução</span>
           <h2>Condutas escondidas no cuidado</h2>
-          <p>Leia o caso, observe o risco e encontre as palavras que representam condutas adequadas.</p>
+          <p>Leia o caso, observe o risco e encontre as palavras que representam manejos adequados.</p>
         </div>
       </div>
 
       <p class="intro-text">
-        Informe seu nome. Para selecionar uma palavra, clique na primeira letra e depois na última, ou arraste sobre a palavra.
+       Informe seu nome e leia as instruções. </br>Em caso de dúvida sobre os manejos veja o capítulo 5 (Tratamento da dor em UTI-A) do guia. 
       </p>
 
       <input type="text" id="player-name" maxlength="28" placeholder="Digite seu nome">
@@ -59,15 +59,25 @@
         <span class="eyebrow">Como jogar</span>
         <h2 id="instructions-title">Instruções do caça-palavras</h2>
         <div class="instructions-scroll">
-          <p>
-            Leia o caso já avaliado ou clique no botão ler o caso para ouvir em áudio e depois cace todos os manejos indicados para ele.
-          </p>
-          <p>
-            Faça isso com os três casos, cada um com um risco maior e, consequentemente, maior terá que ser sua caçada.
-          </p>
-          <p>
-            Para marcar uma palavra, clique na primeira letra e depois na última, ou arraste sobre a palavra. Boa sorte.
-          </p>
+          <div class="instruction-step">
+            <strong>1</strong>
+            <p>Leia o caso clínico já avaliado e observe a estratificação de risco. Se preferir, clique em <b>Ler o caso</b> para ouvir em áudio.</p>
+          </div>
+          <div class="instruction-step">
+            <strong>2</strong>
+            <p>Depois, procure na grade todas as palavras-chave que representam manejos indicados para aquele paciente.</p>
+          </div>
+          <div class="instruction-step">
+            <strong>3</strong>
+            <p>Complete os três casos: baixo risco, risco moderado e alto risco. A cada fase, o jogo fica um pouco mais desafiador.</p>
+          </div>
+          <div class="instruction-step">
+            <strong>4</strong>
+            <p>Para marcar uma palavra, clique na primeira letra e depois na última, ou arraste sobre ela. As palavras podem aparecer na horizontal, vertical ou diagonal.</p>
+          </div>
+          <div class="instruction-tip">
+            <b>Dica:</b> use o marcador <b>?</b> ao lado das palavras para ver uma explicação rápida de cada manejo. Boa sorte!
+          </div>
         </div>
       </div>
     </div>
@@ -76,7 +86,7 @@
       <div id="top-panel">
         <div class="panel-card">Jogador: <span id="player-display">Profissional</span></div>
         <div class="panel-card">Fase: <span id="case-counter">1</span>/<span id="case-total">5</span></div>
-        <div class="panel-card">Pontuação: <span id="score-display">0</span></div>
+        <div class="panel-card">Relógio: <span id="time-display">00:00</span></div>
         <div class="panel-card">Encontradas: <span id="found-count">0</span>/<span id="word-total">0</span></div>
       </div>
 
@@ -111,6 +121,11 @@
             <h3>Fatores identificados</h3>
             <ul id="factor-list"></ul>
           </div>
+
+          <p class="case-note">
+           <strong> Atenção: </strong>Outros fatores biopsicossociais podem estar relacionados ao caso clínico. No entanto, para este jogo, foram apresentados apenas 
+            esses fatores listados.
+          </p>
         </aside>
 
         <main id="puzzle-card">
@@ -141,6 +156,15 @@
           <h2 id="phase-modal-title">Parabéns!</h2>
           <p id="phase-modal-message"></p>
           <button id="phase-modal-btn" class="primary-btn" type="button">IR PARA O PRÓXIMO PACIENTE</button>
+        </div>
+      </div>
+
+      <div id="keyword-modal" class="keyword-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="keyword-modal-title">
+        <div class="keyword-card">
+          <button id="keyword-close" class="keyword-close" type="button" aria-label="Fechar explicação">×</button>
+          <span class="eyebrow">Palavra-chave</span>
+          <h3 id="keyword-modal-title"></h3>
+          <p id="keyword-modal-text"></p>
         </div>
       </div>
 
