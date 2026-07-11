@@ -310,11 +310,11 @@ function playCaseAudio(index) {
   readCaseButton.textContent = 'OUVINDO...';
   audio.onended = () => {
     readCaseButton.classList.remove('playing');
-    readCaseButton.textContent = 'LER O CASO';
+    readCaseButton.textContent = 'OUVIR O CASO';
   };
   audio.play().catch(() => {
     readCaseButton.classList.remove('playing');
-    readCaseButton.textContent = 'LER O CASO';
+    readCaseButton.textContent = 'OUVIR O CASO';
   });
 }
 
