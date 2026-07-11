@@ -78,6 +78,7 @@ const bgAudio = document.getElementById('sound-bg');
 const correctAudio = new Audio('audio/certo.mp3');
 const victoryAudio = new Audio('audio/vitoria.mp3');
 const finalAudio = new Audio('audio/final.mp3');
+const instructionsAudio = new Audio('audio/instrucaocaca.mp3');
 const caseAudios = [
   new Audio('audio/caso1.mp3'),
   new Audio('audio/caso2.mp3'),
@@ -103,6 +104,7 @@ const finalStars = document.getElementById('final-stars');
 const instructionsModal = document.getElementById('instructions-modal');
 const instructionsButton = document.getElementById('instructions-btn');
 const instructionsClose = document.getElementById('instructions-close');
+const listenInstructionsButton = document.getElementById('listen-instructions-btn');
 const readCaseButton = document.getElementById('read-case-btn');
 const keywordModal = document.getElementById('keyword-modal');
 const keywordModalTitle = document.getElementById('keyword-modal-title');
@@ -153,6 +155,18 @@ instructionsButton.addEventListener('click', () => {
   instructionsModal.classList.add('active');
   instructionsModal.setAttribute('aria-hidden', 'false');
 });
+
+listenInstructionsButton.addEventListener('click', () => {
+  stopIntroVideo();
+  instructionsAudio.pause();
+  instructionsAudio.currentTime = 0;
+  instructionsAudio.volume = 0.95;
+  listenInstructionsButton.classList.add('playing');
+  listenInstructionsButton.textContent = 'OUVINDO...';
+  instructionsAudio.play().catch(stopInstructionsAudio);
+});
+
+instructionsAudio.addEventListener('ended', stopInstructionsAudio);
 
 instructionsClose.addEventListener('click', closeInstructions);
 
@@ -246,6 +260,13 @@ function stopIntroVideo() {
   video.currentTime = 0;
 }
 
+function stopInstructionsAudio() {
+  instructionsAudio.pause();
+  instructionsAudio.currentTime = 0;
+  listenInstructionsButton.classList.remove('playing');
+  listenInstructionsButton.textContent = 'OUVIR INSTRUÇÕES';
+}
+
 function tryPlayAudio() {
   bgAudio.volume = 0.28;
   bgAudio.play().catch(() => {});
@@ -297,7 +318,7 @@ function stopCaseAudios() {
     audio.currentTime = 0;
   });
   readCaseButton.classList.remove('playing');
-  readCaseButton.textContent = 'LER O CASO';
+  readCaseButton.textContent = 'OUVIR O CASO';
 }
 
 function playCaseAudio(index) {
@@ -340,6 +361,7 @@ function closePhaseModal() {
 }
 
 function closeInstructions() {
+  stopInstructionsAudio();
   instructionsModal.classList.remove('active');
   instructionsModal.setAttribute('aria-hidden', 'true');
 }

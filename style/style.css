@@ -217,6 +217,18 @@ h1 {
   font-weight: 900;
 }
 
+.instructions-heading {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding-right: 48px;
+}
+.instructions-heading .eyebrow { margin: 0; }
+.listen-instructions-btn {
+  flex: 0 0 auto; min-height: 40px; padding: 9px 15px;
+  border: 1px solid rgba(255,255,255,.58); border-radius: 999px;
+  color: #08305d; background: white; font-size: .78rem; font-weight: 900; cursor: pointer;
+}
+.listen-instructions-btn.playing { color: white; background: rgba(8,48,93,.72); }
+
 .instructions-scroll {
   display: grid;
   gap: 12px;
@@ -521,6 +533,8 @@ h1 {
   font-size: 0.82rem;
   line-height: 1.4;
 }
+
+.case-note strong { font: inherit; font-weight: 900; }
 
 .risk-strip {
   grid-area: risk;
@@ -1291,6 +1305,9 @@ h1 {
     border-radius: 18px;
   }
 
+  .instructions-heading { align-items: stretch; flex-direction: column; gap: 10px; padding-right: 44px; }
+  .listen-instructions-btn { align-self: flex-start; }
+
   #game-container {
     padding: 18px;
     border-radius: 22px;
@@ -1332,4 +1349,16 @@ h1 {
     justify-items: center;
     min-height: 0;
   }
+}
+
+@media (max-width: 760px), (max-height: 560px) {
+  .phase-modal { padding: 10px; }
+  .phase-modal-card { width: min(560px, 100%); max-height: calc(100dvh - 20px); gap: 8px; padding: 14px 16px; border-radius: 18px; overflow-y: auto; }
+  .phase-modal-card .eyebrow { margin-bottom: 0; font-size: .65rem; }
+  .phase-modal-card .star-row { gap: 8px; margin: 0; }
+  .phase-modal-card .star { width: 42px; height: 42px; font-size: 2.35rem; }
+  .phase-modal-card h2 { font-size: 1.55rem; }
+  .phase-modal-card p { font-size: .92rem; line-height: 1.35; }
+  .phase-modal-card .primary-btn { min-height: 40px; padding: 9px 13px; font-size: .75rem; }
+  .case-note, .case-note strong { font-size: .82rem; line-height: 1.4; }
 }
