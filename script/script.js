@@ -1,20 +1,16 @@
 const cases = [
   {
     title: 'Pós-operatório orientado',
-    risk: 'Baixo risco',
-    riskClass: 'low',
     size: 14,
     pathTitle: 'Base do cuidado',
     transitionText: 'O cuidado comeca pelo basico bem feito: validar, orientar, posicionar e registrar com clareza.',
     description: 'Paciente comunicativa, com dor relacionada ao procedimento de desbridamento e boa compreensão das orientações.',
     factors: ['Dor procedural recente', 'Comunicação preservada', 'Ansiedade leve ao movimento', 'Rede familiar presente'],
     words: ['VALIDAÇÃO', 'COMUNICAÇÃO', 'CONFORTO', 'RESPIRAÇÃO', 'METAS', 'REGISTRO', 'POSICIONAMENTO'],
-    hint: 'Procure condutas básicas e proporcionais para um caso de baixo risco.'
+    hint: 'Procure condutas básicas e proporcionais para este caso.'
   },
   {
     title: 'Imobilidade e medo do movimento',
-    risk: 'Risco moderado',
-    riskClass: 'moderate',
     size: 15,
     pathTitle: 'Integracao funcional',
     transitionText: 'Agora o plano precisa conectar dor, movimento, seguranca e confianca funcional.',
@@ -24,16 +20,14 @@ const cases = [
     hint: 'Encontre palavras ligadas à recuperação funcional e à reconstrução da confiança.'
   },
   {
-    title: 'Dor intensa, vulnerabilidade e crenças',
-    risk: 'Alto risco',
-    riskClass: 'high',
+    title: 'Dor intensa, vulnerabilidade e crenças disfuncionais',
     size: 16,
     pathTitle: 'Cuidado ampliado',
     transitionText: 'Neste caso, a dor nao esta sozinha: ela atravessa medo, valores, familia, contexto social e equipe.',
     description: 'Paciente com dor intensa e persistente devido dreno de tórax, medo de piora, vulnerabilidade social, distância da família e crenças importantes sobre adoecimento.',
     factors: ['Dor intensa e persistente', 'Ansiedade e medo', 'Vulnerabilidade social', 'Crenças, fé e valores relevantes', 'Necessidade de plano integrado'],
-    words: ['ACOLHIMENTO', 'FAMÍLIA', 'INCLUSÃO', 'RELAXAMENTO', 'REGISTRO', 'HUMANIZAÇÃO', 'ESCUTA', 'CRENÇAS', 'VALORES', 'INTERDISCIPLINAR', 'ELETROTERAPIA', 'MOBILIZAÇÃO'],
-    hint: 'O alto risco aumenta a dificuldade e integra fatores físicos, emocionais, sociais, familiares e culturais.'
+    words: ['ACOLHIMENTO', 'FAMÍLIA', 'INCLUSÃO', 'RELAXAMENTO', 'REGISTRO', 'HUMANIZAÇÃO', 'ESCUTA', 'CRENÇAS', 'VALORES', 'EQUIPE', 'ELETROTERAPIA', 'MOBILIZAÇÃO'],
+    hint: 'Este caso integra fatores físicos, emocionais, sociais, familiares e culturais.'
   }
 ];
 
@@ -78,6 +72,7 @@ const bgAudio = document.getElementById('sound-bg');
 const correctAudio = new Audio('audio/certo.mp3');
 const victoryAudio = new Audio('audio/vitoria.mp3');
 const finalAudio = new Audio('audio/final.mp3');
+const finishedAudio = new Audio('audio/acabou.mp3');
 const instructionsAudio = new Audio('audio/instrucaocaca.mp3');
 const caseAudios = [
   new Audio('audio/caso1.mp3'),
@@ -111,7 +106,7 @@ const keywordModalTitle = document.getElementById('keyword-modal-title');
 const keywordModalText = document.getElementById('keyword-modal-text');
 const keywordClose = document.getElementById('keyword-close');
 const phaseMessages = [
-  'Você achou os manejos para esse paciente. E agora vamos para o próximo! A extratificação de risco agora é um pouco maior. Boa sorte.',
+  'Você achou os manejos para esse paciente. E agora vamos para o próximo! O próximo caso será um pouco mais desafiador. Boa sorte.',
   'Você está evoluindo muito bem! Vamos para o paciente mais difícil agora. Não perca tempo.'
 ];
 const keywordExplanations = {
@@ -121,7 +116,7 @@ const keywordExplanations = {
   ELETROTERAPIA: 'Utilize recursos eletroterapêuticos quando indicados para auxiliar no controle da dor.',
   AMBIENTAL: 'Adapte o ambiente para reduzir estressores, como ruídos, luminosidade e desconfortos térmicos.',
   CONFIANCA: 'Promova um ambiente colaborativo para fortalecer a confiança entre paciente e equipe.',
-  INTERDISCIPLINAR: 'Integre diferentes profissionais para um manejo mais completo e eficaz da dor.',
+  EQUIPE: 'Integre diferentes profissionais para um manejo mais completo e eficaz da dor.',
   COMUNICACAO: 'Comunique-se de forma clara e empática, certificando-se de que o paciente compreendeu as orientações.',
   REGISTRO: 'Registre a avaliação e o manejo da dor de forma clara, completa e oportuna.',
   VALIDACAO: 'Reconheça e valide a dor do paciente para fortalecer o vínculo e reduzir o sofrimento.',
@@ -302,7 +297,8 @@ function stopMotivationAudios() {
 }
 
 function playTimedMotivation() {
-  if (!screens.game.classList.contains('active') || phaseModal.classList.contains('active')) {
+  const caseAudioIsPlaying = caseAudios.some((audio) => !audio.paused && !audio.ended);
+  if (!screens.game.classList.contains('active') || phaseModal.classList.contains('active') || caseAudioIsPlaying) {
     return;
   }
 
@@ -325,6 +321,7 @@ function playCaseAudio(index) {
   const audio = caseAudios[index];
   if (!audio) return;
 
+  stopMotivationAudios();
   stopCaseAudios();
   audio.volume = 0.95;
   readCaseButton.classList.add('playing');
@@ -449,8 +446,6 @@ function loadCase(index) {
   document.getElementById('case-counter').textContent = index + 1;
   document.getElementById('patient-title').textContent = currentCase.title;
   document.getElementById('patient-description').textContent = currentCase.description;
-  document.getElementById('risk-label').textContent = currentCase.risk;
-  document.querySelector('.risk-strip').className = `risk-strip ${currentCase.riskClass}`;
   document.getElementById('factor-list').innerHTML = currentCase.factors.map((factor) => `<li>${factor}</li>`).join('');
   document.getElementById('hint-text').textContent = currentCase.hint;
   document.getElementById('word-total').textContent = currentCase.words.length;
@@ -754,6 +749,7 @@ function finishCase() {
   }
 
   playEffect(finalAudio, 0.9);
+  playEffect(finishedAudio, 0.95);
   showFinalScreen();
 }
 
