@@ -5,7 +5,7 @@ const cases = [
     pathTitle: 'Base do cuidado',
     transitionText: 'O cuidado comeca pelo basico bem feito: validar, orientar, posicionar e registrar com clareza.',
     description: 'Paciente comunicativa, com dor relacionada ao procedimento de desbridamento e boa compreensão das orientações.',
-    factors: ['Dor procedural recente', 'Comunicação preservada', 'Ansiedade leve ao movimento', 'Rede familiar presente'],
+    factors: ['Dor procedural recente', 'Ansiedade leve ao movimento'],
     words: ['VALIDAÇÃO', 'COMUNICAÇÃO', 'CONFORTO', 'RESPIRAÇÃO', 'METAS', 'REGISTRO', 'POSICIONAMENTO'],
     hint: 'Procure condutas básicas e proporcionais para este caso.'
   },
@@ -24,8 +24,8 @@ const cases = [
     size: 16,
     pathTitle: 'Cuidado ampliado',
     transitionText: 'Neste caso, a dor nao esta sozinha: ela atravessa medo, valores, familia, contexto social e equipe.',
-    description: 'Paciente com dor intensa e persistente devido dreno de tórax, medo de piora, vulnerabilidade social, distância da família e crenças importantes sobre adoecimento.',
-    factors: ['Dor intensa e persistente', 'Ansiedade e medo', 'Vulnerabilidade social', 'Crenças, fé e valores relevantes', 'Necessidade de plano integrado'],
+    description: 'Paciente com dor intensa e persistente devido dreno de tórax, medo de piora, vulnerabilidade social, distância da família e crenças negativas sobre adoecimento.',
+    factors: ['Dor intensa e persistente', 'Ansiedade e medo', 'Vulnerabilidade social', 'Crenças negativas', 'Rede de apoio prejudicada'],
     words: ['ACOLHIMENTO', 'FAMÍLIA', 'INCLUSÃO', 'RELAXAMENTO', 'REGISTRO', 'HUMANIZAÇÃO', 'ESCUTA', 'CRENÇAS', 'VALORES', 'EQUIPE', 'ELETROTERAPIA', 'MOBILIZAÇÃO'],
     hint: 'Este caso integra fatores físicos, emocionais, sociais, familiares e culturais.'
   }
