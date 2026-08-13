@@ -263,7 +263,7 @@ function stopInstructionsAudio() {
 }
 
 function tryPlayAudio() {
-  bgAudio.volume = 0.02;
+  bgAudio.volume = 0.06;
   bgAudio.play().catch(() => {});
 }
 
